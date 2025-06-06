@@ -19,6 +19,35 @@ if (Test-Path $themePath) {
     Write-Warning "Theme '$env:PWSH_THEME' not found."
 }
 
+Load_Plugins($env:PWSH_PLUGINS)
+
+function Load_Plugins {
+    param (
+        [string[]]$pluginList
+    )
+
+    foreach ($plugin in $pluginList) {
+        $pluginDir = Join-Path $env:PWSH "plugins"
+
+        # If it's a directory load all
+        $fullDir = Join-Path $pluginDir $plugin
+        if ((Test-Path $fullDir) -and ((Get-Item $fullDir).PSIsContainer)) {
+            Get-ChildItem "$fullDir\*.ps1" | ForEach-Object {
+                . $_.FullName
+            }
+        }
+        #  look for individual plugin files in any directory
+        else {
+            $match = Get-ChildItem -Recurse -Filter "$plugin.ps1" -Path $pluginDir | Select-Object -First 1
+            if ($match) {
+                . $match.FullName
+            } else {
+                Write-Warning "Plugin '$plugin' not found."
+            }
+        }
+    }
+}
+
 function Update-PwshStats {
     $historyItem = Get-History -Count 1
     if (-not $historyItem) { return }
