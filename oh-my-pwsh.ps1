@@ -18,3 +18,51 @@ if (Test-Path $themePath) {
 } else {
     Write-Warning "Theme '$env:PWSH_THEME' not found."
 }
+
+function Update-PwshStats {
+    $historyItem = Get-History -Count 1
+    if (-not $historyItem) { return }
+
+    $commandLine = $historyItem.CommandLine.Trim()
+    if (-not $commandLine) { return }
+
+    $firstToken = $commandLine.Split()[0]
+
+    $global:__lastLoggedCommand = $firstToken
+
+    if (Test-Path $PWSH_STATS_FILE) {
+        $stats = Get-Content $PWSH_STATS_FILE -Raw | ConvertFrom-Json -AsHashtable
+    } else {
+        $stats = @{}
+    }
+
+    if ($stats.ContainsKey($firstToken)) {
+        $stats[$firstToken]++
+    } else {
+        $stats[$firstToken] = 1
+    }
+
+    $stats | ConvertTo-Json -Depth 1 | Set-Content -Path $PWSH_STATS_FILE -Encoding UTF8
+}
+
+function pwsh_stats {
+    if (Test-Path $PWSH_STATS_FILE) {
+		$rawStats = Get-Content $PWSH_STATS_FILE | ConvertFrom-Json -AsHashtable
+        $totalCount = ($rawStats.Values | Measure-Object -Sum).Sum
+
+        $statData = $rawStats.GetEnumerator() | Sort-Object Value -Descending
+        $top = $statData | Select-Object -First 20
+
+        $counter = 1
+		foreach ($item in $top) {
+			$cmd = $item.Name
+			$amount = $item.Value
+            $percent = "{0:N1}" -f (($amount / $totalCount) * 100)
+
+			Write-Host ("{0, 5} {1, 5}  {2, 5}  {3, -15}" -f $counter, $amount, "$percent%", $cmd)
+            $counter++
+        }
+    } else {
+        "No stats file found at $PWSH_STATS_FILE"
+    }
+}

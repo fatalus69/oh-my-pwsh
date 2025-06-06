@@ -35,6 +35,8 @@
 		Write-Host "➤ " -ForegroundColor Red -NoNewline
 	}
 
+    Update-PwshStats
+    
     return " "
 	# Update-PwshStats
 }
