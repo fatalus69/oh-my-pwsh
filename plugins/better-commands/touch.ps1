@@ -2,7 +2,7 @@
   Name: touch
   Description: create files
 #>
-function touch {
+function global:touch {
 	param(
 		[Parameter(Mandatory = $true)]
 		[string]$filename

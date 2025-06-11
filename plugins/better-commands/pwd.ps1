@@ -6,6 +6,6 @@ if (Test-Path alias:pwd) {
   Name: pwd
   Description: Print working directory
 #>
-function pwd {
+function global:pwd {
 	(Get-Location).Path
 }

@@ -19,8 +19,6 @@ if (Test-Path $themePath) {
     Write-Warning "Theme '$env:PWSH_THEME' not found."
 }
 
-Load_Plugins($env:PWSH_PLUGINS)
-
 function Load_Plugins {
     param (
         [string[]]$pluginList
@@ -33,6 +31,7 @@ function Load_Plugins {
         $fullDir = Join-Path $pluginDir $plugin
         if ((Test-Path $fullDir) -and ((Get-Item $fullDir).PSIsContainer)) {
             Get-ChildItem "$fullDir\*.ps1" | ForEach-Object {
+                Write-Host $_.FullName
                 . $_.FullName
             }
         }
@@ -95,3 +94,6 @@ function pwsh_stats {
         "No stats file found at $PWSH_STATS_FILE"
     }
 }
+
+#Calls
+Load_Plugins($env:PWSH_PLUGINS)

@@ -6,7 +6,7 @@ if (Test-Path alias:mkdir) {
   Name: mkdir
   Description: create directories without output
 #>
-function mkdir {
+function global:mkdir {
     param(
         [Parameter(Mandatory = $true)]
         [string]$dirname

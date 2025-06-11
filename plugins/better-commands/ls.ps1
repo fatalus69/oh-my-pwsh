@@ -5,7 +5,7 @@ if (Test-Path alias:ls) {
   Name: ls
   Description: Colorized, columnized directory listing
 #>
-function ls {
+function global:ls {
 	 param (
         [string]$Path = "."
     )
